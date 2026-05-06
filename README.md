@@ -155,3 +155,34 @@ Feel free to fork this project and enhance it!
 ## 📄 License
 
 This project is for educational purposes.
+
+# Smart Service Booking System 🚀
+
+A full-stack backend application built using Spring Boot.
+
+## Features
+- User Registration & Login
+- Password Encryption (BCrypt)
+- REST APIs
+- MySQL Database Integration
+
+## Tech Stack
+- Java 17
+- Spring Boot
+- Hibernate (JPA)
+- MySQL
+- Maven
+
+## API Endpoints
+
+### Register
+POST /api/users/register
+
+### Login
+POST /api/users/login
+
+## Run Project
+
+1. Configure database in application.properties
+2. Run ServicebookingApplication
+3. Test using Postman
