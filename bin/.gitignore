@@ -1,0 +1,20 @@
+# Maven build folder
+target/
+
+# Java compiled files
+*.class
+
+# Logs
+*.log
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+
+# Spring Boot
+*.jar
+*.war

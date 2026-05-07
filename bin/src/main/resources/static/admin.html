@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | ServeEasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">
+            <span class="logo-icon">⚡</span><span class="logo-text">Serve<span class="logo-accent">Easy</span> Admin</span>
+        </a>
+        <div class="nav-actions">
+            <div class="user-menu" style="display:block">
+                <button class="user-avatar-btn" id="userAvatarBtn">
+                    <span class="user-avatar" id="userAvatarText" style="background:var(--dark);">A</span>
+                    <span id="userNameNav">Admin</span>
+                    <span class="chevron">▾</span>
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <button class="dropdown-item text-danger" id="logoutBtn">🚪 Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-menu">
+            <a href="admin.html" class="sidebar-link active"><span>📊</span> Dashboard</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="dash-header">
+            <h1 class="dash-title">Platform Overview</h1>
+        </div>
+
+        <div class="stats-grid" id="adminStats">
+            <!-- Loaded via JS -->
+            <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+
+        <h2 style="margin-bottom: 24px;">Recent Bookings</h2>
+        <div style="background: white; border-radius: 16px; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); box-shadow: var(--shadow-sm);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                    <tr>
+                        <th style="padding: 16px; font-weight: 600; color: var(--text-muted);">ID</th>
+                        <th style="padding: 16px; font-weight: 600; color: var(--text-muted);">Customer</th>
+                        <th style="padding: 16px; font-weight: 600; color: var(--text-muted);">Service</th>
+                        <th style="padding: 16px; font-weight: 600; color: var(--text-muted);">Provider</th>
+                        <th style="padding: 16px; font-weight: 600; color: var(--text-muted);">Date/Time</th>
+                        <th style="padding: 16px; font-weight: 600; color: var(--text-muted);">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="adminBookings">
+                    <!-- Loaded via JS -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const user = checkAuth();
+        if (!user || user.role !== 'ADMIN') {
+            window.location.href = 'login.html';
+            return;
+        }
+        
+        fetchAdminStats();
+        fetchAdminBookings();
+    });
+
+    async function fetchAdminStats() {
+        try {
+            const res = await fetch('/api/admin/dashboard', { headers: getAuthHeaders() });
+            const data = await res.json();
+            
+            if (data.success) {
+                const s = data.data;
+                document.getElementById('adminStats').innerHTML = `
+                    <div class="dash-stat-card">
+                        <div class="dash-stat-label">Total Revenue</div>
+                        <div class="dash-stat-value text-success">${formatCurrency(s.totalRevenue)}</div>
+                    </div>
+                    <div class="dash-stat-card">
+                        <div class="dash-stat-label">Total Bookings</div>
+                        <div class="dash-stat-value">${s.totalBookings}</div>
+                    </div>
+                    <div class="dash-stat-card">
+                        <div class="dash-stat-label">Total Users</div>
+                        <div class="dash-stat-value">${s.totalUsers}</div>
+                    </div>
+                    <div class="dash-stat-card">
+                        <div class="dash-stat-label">Total Providers</div>
+                        <div class="dash-stat-value">${s.totalProviders}</div>
+                    </div>
+                `;
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function fetchAdminBookings() {
+        try {
+            const res = await fetch('/api/admin/bookings', { headers: getAuthHeaders() });
+            const data = await res.json();
+            
+            if (data.success) {
+                const tbody = document.getElementById('adminBookings');
+                tbody.innerHTML = data.data.map(b => `
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                        <td style="padding: 16px;">#${b.id}</td>
+                        <td style="padding: 16px;">
+                            <div style="font-weight: 500;">${b.user.name}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">${b.user.phone}</div>
+                        </td>
+                        <td style="padding: 16px;">${b.service.name}</td>
+                        <td style="padding: 16px;">${b.provider ? b.provider.user.name : '<span style="color:var(--text-muted);font-style:italic">Unassigned</span>'}</td>
+                        <td style="padding: 16px;">${b.bookingDate}<br><span style="color:var(--text-muted);font-size:0.85rem;">${b.bookingTime}</span></td>
+                        <td style="padding: 16px;">
+                            <span class="status-badge status-${b.status}" style="font-size: 0.75rem;">${b.status}</span>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+        } catch (e) { console.error(e); }
+    }
+</script>
+</body>
+</html>

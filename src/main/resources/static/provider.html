@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provider Dashboard | ServeEasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .job-card { background: white; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); border: 1px solid rgba(0,0,0,0.05); }
+        .job-header { display: flex; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px; }
+        .job-info { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .info-label { color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-value { font-weight: 500; }
+        .job-actions { display: flex; gap: 12px; justify-content: flex-end; }
+        .status-badge { padding: 6px 12px; border-radius: 50px; font-size: 0.85rem; font-weight: 600; }
+        .status-PENDING { background: #fef3c7; color: #d97706; }
+        .status-CONFIRMED { background: #dbeafe; color: #2563eb; }
+        .status-IN_PROGRESS { background: #e0e7ff; color: #4f46e5; }
+        .status-COMPLETED { background: #d1fae5; color: #059669; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="/" class="logo">
+            <span class="logo-icon">⚡</span><span class="logo-text">Serve<span class="logo-accent">Easy</span> PRO</span>
+        </a>
+        <div class="nav-actions">
+            <div class="user-menu" style="display:block">
+                <button class="user-avatar-btn" id="userAvatarBtn">
+                    <span class="user-avatar" id="userAvatarText">P</span>
+                    <span id="userNameNav">Provider</span>
+                    <span class="chevron">▾</span>
+                </button>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <button class="dropdown-item text-danger" id="logoutBtn">🚪 Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="dashboard-layout">
+    <aside class="sidebar">
+        <div class="sidebar-menu">
+            <a href="provider.html" class="sidebar-link active"><span>📋</span> My Jobs</a>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="dash-header">
+            <h1 class="dash-title">Assigned Jobs</h1>
+        </div>
+
+        <div id="jobsList">
+            <div class="loading-spinner"><div class="spinner"></div></div>
+        </div>
+    </main>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const user = checkAuth();
+        if (!user || user.role !== 'PROVIDER') {
+            window.location.href = 'login.html';
+            return;
+        }
+        fetchJobs();
+    });
+
+    async function fetchJobs() {
+        try {
+            const res = await fetch('/api/provider/bookings', {
+                headers: getAuthHeaders()
+            });
+            const data = await res.json();
+            
+            const list = document.getElementById('jobsList');
+            if (data.success) {
+                if (data.data.length === 0) {
+                    list.innerHTML = '<div class="text-center" style="padding: 40px; background: white; border-radius: 16px;"><h3>No jobs assigned yet</h3></div>';
+                    return;
+                }
+                
+                list.innerHTML = data.data.map(job => `
+                    <div class="job-card">
+                        <div class="job-header">
+                            <div>
+                                <h3 style="margin-bottom: 4px;">${job.service.name}</h3>
+                                <span class="status-badge status-${job.status}">${job.status.replace('_', ' ')}</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="info-label">Expected Payout</div>
+                                <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary);">${formatCurrency(job.totalAmount)}</div>
+                            </div>
+                        </div>
+                        <div class="job-info">
+                            <div>
+                                <div class="info-label">Customer Name</div>
+                                <div class="info-value">${job.user.name} (${job.user.phone})</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Schedule</div>
+                                <div class="info-value">${job.bookingDate} at ${job.bookingTime}</div>
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <div class="info-label">Service Address</div>
+                                <div class="info-value">${job.address}</div>
+                            </div>
+                            ${job.notes ? `
+                            <div style="grid-column: span 2;">
+                                <div class="info-label">Notes</div>
+                                <div class="info-value" style="color: #64748b; font-style: italic;">"${job.notes}"</div>
+                            </div>` : ''}
+                        </div>
+                        <div class="job-actions">
+                            ${job.status === 'PENDING' ? `
+                                <button class="btn btn-outline" style="border-color: var(--danger); color: var(--danger);" onclick="updateJob(${job.id}, 'reject')">Reject</button>
+                                <button class="btn btn-primary" onclick="updateJob(${job.id}, 'accept')">Accept Job</button>
+                            ` : ''}
+                            ${job.status === 'CONFIRMED' ? `
+                                <button class="btn btn-primary" onclick="updateJob(${job.id}, 'start')">Start Job</button>
+                            ` : ''}
+                            ${job.status === 'IN_PROGRESS' ? `
+                                <button class="btn btn-primary" style="background: var(--success);" onclick="updateJob(${job.id}, 'complete')">Mark as Completed</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    async function updateJob(id, action) {
+        if (!confirm(`Are you sure you want to ${action} this job?`)) return;
+        try {
+            const res = await fetch(`/api/provider/bookings/${id}/${action}`, {
+                method: 'PATCH',
+                headers: getAuthHeaders()
+            });
+            if (res.ok) {
+                fetchJobs();
+            } else {
+                alert(`Failed to ${action} job`);
+            }
+        } catch (e) { console.error(e); }
+    }
+</script>
+</body>
+</html>

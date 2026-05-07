@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | ServeEasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<div class="auth-page">
+    <div class="auth-card" style="max-width: 600px;">
+        <div class="auth-header">
+            <a href="/" class="logo" style="justify-content: center; margin-bottom: 24px;">
+                <span class="logo-icon">⚡</span><span class="logo-text">Serve<span class="logo-accent">Easy</span></span>
+            </a>
+            <h1 class="auth-title">Create Account</h1>
+            <p style="color: var(--text-muted);">Join our community of satisfied customers</p>
+        </div>
+        
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="+91 XXXXX XXXXX" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="password" class="form-control" placeholder="••••••••" required minlength="6">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Address</label>
+                <textarea id="address" class="form-control" rows="2" placeholder="Your full address for service delivery" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Account Type</label>
+                <select id="role" class="form-control">
+                    <option value="USER">Customer (I want to book services)</option>
+                    <option value="PROVIDER">Professional (I want to provide services)</option>
+                </select>
+            </div>
+            
+            <div id="authError" class="text-danger" style="margin-bottom: 16px; text-align: center;"></div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%;" id="registerSubmitBtn">Create Account</button>
+        </form>
+        
+        <div class="auth-footer">
+            Already have an account? <a href="login.html" class="auth-link">Login</a>
+        </div>
+    </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+    async function handleRegister(e) {
+        e.preventDefault();
+        const btn = document.getElementById('registerSubmitBtn');
+        btn.innerText = 'Creating...';
+        btn.disabled = true;
+        
+        const payload = {
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            address: document.getElementById('address').value,
+            role: document.getElementById('role').value
+        };
+        
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            const data = await res.json();
+            
+            if (res.ok && data.success) {
+                localStorage.setItem('token', data.data.token);
+                localStorage.setItem('user', JSON.stringify(data.data));
+                
+                if (data.data.role === 'PROVIDER') {
+                    window.location.href = 'provider.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            } else {
+                document.getElementById('authError').innerText = data.message || 'Registration failed';
+            }
+        } catch (err) {
+            document.getElementById('authError').innerText = 'Connection error. Please try again.';
+        } finally {
+            btn.innerText = 'Create Account';
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
