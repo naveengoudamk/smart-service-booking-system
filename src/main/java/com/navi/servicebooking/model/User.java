@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "users")
@@ -25,6 +26,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -44,6 +46,7 @@ public class User {
     @Column(name = "profile_image")
     private String profileImage;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 

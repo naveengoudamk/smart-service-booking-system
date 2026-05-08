@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "providers")
@@ -43,6 +44,7 @@ public class Provider {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @JsonIgnore
     @ManyToMany
     @JoinTable(
         name = "provider_services",
@@ -51,6 +53,7 @@ public class Provider {
     )
     private List<Service> services = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "provider", cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 

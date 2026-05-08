@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "services")
@@ -51,9 +52,11 @@ public class Service {
     @Column(name = "total_bookings")
     private Integer totalBookings = 0;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
     private List<Booking> bookings = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "services")
     private List<Provider> providers = new ArrayList<>();
 }
