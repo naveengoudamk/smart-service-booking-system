@@ -1,188 +1,92 @@
 # 🚀 Smart Service Booking System
 
-A full-stack web application that allows users to book home services such as electricians, plumbers, and cleaning professionals. This system simulates real-world service platforms like Urban Company.
+A full-stack **service booking platform** built with **Java, Spring Boot, Spring MVC, Spring Data JPA, Hibernate, and MySQL**.
+
+The application allows customers to discover home services, create bookings, and manage their booking history. It also provides administrative functionality for managing users, services, and bookings.
+
+> 🎯 The project is designed to simulate a real-world home-service platform similar to platforms such as Urban Company.
 
 ---
 
 ## 📌 Overview
 
-The Smart Service Booking System enables users to:
+The **Smart Service Booking System** provides a centralized platform where customers can book home services such as:
 
-* Browse available services
-* Book appointments
-* Manage bookings
+- 🔧 Electrician
+- 🚰 Plumber
+- 🧹 Cleaning
+- 🛠️ Home Maintenance
+- 🔨 Other household services
 
-It also provides admin features for managing services, users, and bookings.
-
----
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-* HTML
-* CSS
-* JavaScript
-
-### Backend
-
-* Java
-* Spring Boot
-* Spring MVC
-* Spring Data JPA (Hibernate)
-
-### Database
-
-* MySQL
-
-### Tools
-
-* Git & GitHub
-* Maven
+The system follows a layered backend architecture using Spring Boot and exposes REST APIs that can be consumed by a web frontend or tools such as Postman.
 
 ---
 
-## ✨ Features
+# ✨ Key Features
 
-### 👤 User
+## 👤 Customer
 
-* User Registration & Login
-* View available services
-* Book services
-* View booking history
+- User registration
+- User login
+- Password encryption using BCrypt
+- View available services
+- Book a service
+- View booking history
+- Manage personal bookings
 
-### 🛠️ Service Provider (Future Scope)
+## 🧑‍💼 Admin
 
-* Accept/Reject bookings
-* Update service status
+- Manage users
+- Add services
+- Remove services
+- View available services
+- View all bookings
+- Manage the overall service-booking system
 
-### 🧑‍💼 Admin
+## 🛠️ Service Provider
 
-* Add/Remove services
-* Manage users
-* View all bookings
+The service-provider module is planned for future implementation.
 
----
+Planned functionality:
 
-## 🗂️ Project Structure
-
-```
-smart-service-booking-system/
-│
-├── backend/        # Spring Boot Application
-├── frontend/       # HTML, CSS, JS files
-├── database/       # SQL scripts
-└── README.md
-```
-
----
-
-## 🗄️ Database Design
-
-Main tables:
-
-* Users
-* Services
-* Bookings
-
-Relationships:
-
-* One user can have multiple bookings
-* Each booking is linked to a service
+- View assigned bookings
+- Accept or reject bookings
+- Update service status
+- Manage service availability
 
 ---
 
-## 🔗 API Endpoints (Sample)
+# 🏗️ Application Architecture
 
-* POST `/register` → Register new user
-* POST `/login` → User login
-* GET `/services` → Fetch all services
-* POST `/book-service` → Book a service
-* GET `/my-bookings` → View user bookings
+The backend follows a layered architecture:
 
----
-
-## 🔐 Security
-
-* Authentication using Spring Security (to be implemented)
-* Role-based access (User / Admin)
-
----
-
-## 🚀 Future Enhancements
-
-* Payment Integration (Razorpay)
-* Email Notifications
-* Rating & Review System
-* Real-time booking updates
-* Admin dashboard analytics
-
----
-
-## 📷 Screenshots
-
-*Still working on (looding)*
-
----
-
-## 🧪 How to Run
-
-### Backend
-
-1. Open backend folder in IDE
-2. Configure MySQL database
-3. Run Spring Boot application
-
-### Frontend
-
-1. Open HTML files in browser
-2. Connect APIs using JavaScript
-
----
-
-## 📌 Author
-
-**Navi**
-
----
-
-## ⭐ Contribution
-
-Feel free to fork this project and enhance it!
-
----
-
-## 📄 License
-
-This project is for educational purposes.
-
-# Smart Service Booking System 🚀
-
-A full-stack backend application built using Spring Boot.
-
-## Features
-- User Registration & Login
-- Password Encryption (BCrypt)
-- REST APIs
-- MySQL Database Integration
-
-## Tech Stack
-- Java 17
-- Spring Boot
-- Hibernate (JPA)
-- MySQL
-- Maven
-
-## API Endpoints
-
-### Register
-POST /api/users/register
-
-### Login
-POST /api/users/login
-
-## Run Project
-
-1. Configure database in application.properties
-2. Run ServicebookingApplication
-3. Test using Postman
+```text
+                    ┌──────────────────────┐
+                    │      Frontend        │
+                    │ HTML / CSS / JS      │
+                    └──────────┬───────────┘
+                               │
+                               │ REST API
+                               ▼
+                    ┌──────────────────────┐
+                    │    Controller Layer  │
+                    │   Spring REST API    │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │     Service Layer    │
+                    │ Business Logic       │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │   Repository Layer   │
+                    │ Spring Data JPA      │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │       MySQL          │
+                    │      Database        │
+                    └──────────────────────┘
